@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'esite.home',
     'esite.search',
     'esite.api',
-    'esite.aqms',
 
     'rest_framework',
     'graphene_django',
