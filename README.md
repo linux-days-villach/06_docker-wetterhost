@@ -1,2 +1,2 @@
-# erebos + django + wagtail = <3
-A project to make the erebos website more manageable w/ wagtail.
+# traefik + django + wagtail = <3
+A project to illustrate the functionality of traefik as a reverse proxy.
