@@ -26,6 +26,12 @@ from .types import (  # noqa: E402
     SnippetsQueryMixin,
 )
 
+import graphql_jwt
+import esite.charm.schema_relay
+import esite.charm.schema
+import esite.registration.schema
+
+# Register all your schemes for graphql here.
 
 # api version
 GRAPHQL_API_FORMAT = (0, 2, 0)
@@ -41,16 +47,19 @@ SettingsQueryMixin_ = SettingsQueryMixin()  # type: Any
 SnippetsQueryMixin_ = SnippetsQueryMixin()  # type: Any
 
 
-class Query(graphene.ObjectType,
-            AuthQueryMixin_,
-            DocumentQueryMixin_,
+class Query(#esite.charm.schema.Query,
+            esite.registration.schema.Query,
+            #esite.charm.schema_relay.RelayQuery,
+            graphene.ObjectType,
+            #AuthQueryMixin_,
+            #DocumentQueryMixin_,
             ImageQueryMixin_,
             InfoQueryMixin_,
-            MenusQueryMixin_,
+            #MenusQueryMixin_,
             PagesQueryMixin_,
-            SettingsQueryMixin_,
-            SnippetsQueryMixin_,
-            RelayMixin
+            #SettingsQueryMixin_,
+            #SnippetsQueryMixin_,
+            RelayMixin,
             ):
     # API Version
     format = graphene.Field(String)
@@ -61,8 +70,11 @@ class Query(graphene.ObjectType,
 
 def mutation_parameters() -> dict:
     dict_params = {
-        'login': LoginMutation.Field(),
-        'logout': LogoutMutation.Field(),
+        #'login': LoginMutation.Field(),
+        #'logout': LogoutMutation.Field(),
+        'token_auth': graphql_jwt.ObtainJSONWebToken.Field(),
+        'verify_token': graphql_jwt.Verify.Field(),
+        'refresh_token': graphql_jwt.Refresh.Field(),
     }
     dict_params.update((camel_case_to_spaces(n).replace(' ', '_'), mut.Field())
                        for n, mut in registry.forms.items())

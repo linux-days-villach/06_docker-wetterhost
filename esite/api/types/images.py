@@ -7,6 +7,8 @@ import graphene
 # graphene_django
 from graphene_django import DjangoObjectType
 from graphene_django.converter import convert_django_field
+# graphql_jwt
+from graphql_jwt.decorators import login_required, permission_required, staff_member_required, superuser_required
 # graphene_django_optimizer
 import graphene_django_optimizer as gql_optimizer
 # wagtail images
@@ -86,11 +88,14 @@ def generate_image_url(image: wagtailImage, filter_spec: str) -> str:
 
 def ImageQueryMixin():
     class Mixin:
-        images = graphene.List(Image)
+        images = graphene.List(Image,
+                               token=graphene.String(required=False))
         image = graphene.Field(Image,
+                               token=graphene.String(required=False),
                                id=graphene.Int(required=True))
 
-        def resolve_images(self, info: ResolveInfo):
+        @login_required
+        def resolve_images(self, info: ResolveInfo, **_kwargs):
             return with_collection_permissions(
                 info.context,
                 gql_optimizer.query(
@@ -99,7 +104,8 @@ def ImageQueryMixin():
                 )
             )
 
-        def resolve_image(self, info: ResolveInfo, id: int):
+        @login_required
+        def resolve_image(self, info: ResolveInfo, id: int, **_kwargs):
             image = with_collection_permissions(
                 info.context,
                 gql_optimizer.query(
